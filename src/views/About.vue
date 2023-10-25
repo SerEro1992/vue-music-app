@@ -1,9 +1,3 @@
 <template>
-  <div></div>
+  <h1>This is page about</h1>
 </template>
-
-<script>
-export default {};
-</script>
-
-<style lang="scss" scoped></style>

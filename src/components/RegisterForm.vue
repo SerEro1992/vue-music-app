@@ -1,7 +1,7 @@
 <template>
   <!-- Registration Form -->
   <div
-    class="text-white text-center font-bold p-4 rounded mb-4"
+    class="p-4 mb-4 font-bold text-center text-white rounded"
     v-if="reg_show_alert"
     :class="reg_alert_variant"
   >
@@ -50,6 +50,7 @@
         <input
           class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
           placeholder="Password"
+
           v-bind="field"
         />
         <div class="text-red-600" v-for="error in errors" :key="error">{{ error }}</div>
@@ -62,10 +63,11 @@
       <vee-field
         name="confirm_password"
         type="password"
+
         class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
         placeholder="Confirm Password"
       />
-      <ErrorMessage class="text-red-600" name="confirm_passsword" />
+      <ErrorMessage class="text-red-600" name="confirm_password" />
     </div>
 
     <!-- Country -->
@@ -85,17 +87,17 @@
     </div>
 
     <!-- TOS -->
-    <div class="mb-3 pl-6">
+    <div class="pl-6 mb-3">
       <vee-field
         name="tos"
         id="tosCheck"
         type="checkbox"
         value="1"
-        class="w-4 h-4 float-left -ml-6 mt-1 rounded"
+        class="float-left w-4 h-4 mt-1 -ml-6 rounded"
       />
       <label class="inline-block" for="tosCheck">Accept terms of service</label>
 
-      <ErrorMessage class="text-red-600 block" name="tos" />
+      <ErrorMessage class="block text-red-600" name="tos" />
     </div>
 
     <button
@@ -109,6 +111,10 @@
 </template>
 
 <script>
+
+import { mapActions } from 'pinia';
+import useUserStore from '@/stores/user';
+
 export default {
   name: 'RegisterForm',
   data() {
@@ -132,17 +138,29 @@ export default {
       reg_alert_msg: 'Please wait! Your account is being created.',
     };
   },
+
   methods: {
-    register(values) {
+    ...mapActions(useUserStore, {
+      createUser: 'register',
+    }),
+    async register(values) {
       this.reg_show_alert = true;
       this.reg_in_submission = true;
       this.reg_alert_variant = 'bg-blue-500';
       this.reg_alert_msg = 'Please wait! Your account is being created.';
 
-      this.reg_alert_variant = 'bg-green-500';
-      this.reg_alert_msg = 'Успех! Ваша учетная запись создана.';
+      try {
+        await this.createUser(values);
+      } catch (error) {
+        this.reg_in_submission = false;
+        this.reg_alert_variant = 'bg-red-500';
+        this.reg_alert_msg = 'An unexpected error occurred. Please try again later.';
+        return;
+      }
 
-      console.log(values);
+      this.reg_alert_variant = 'bg-green-500';
+      this.reg_alert_msg = 'Success! Your account has been created.';
+      window.location.reload();
     },
   },
 };
