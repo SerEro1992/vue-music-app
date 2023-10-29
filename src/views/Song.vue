@@ -1,93 +1,105 @@
 <template>
-  <main>
-    <!-- Music Header -->
-    <section class="relative w-full mb-8 text-center text-white py-14">
-      <div
-        class="box-border absolute inset-0 w-full h-full bg-contain music-bg"
-        style="background-image: url(/img/song-header.png)"
-      ></div>
-      <div class="container flex items-center mx-auto">
-        <!-- Play/Pause Button -->
-        <button
-          @click.prevent="newSong(song)"
-          type="button"
-          class="z-50 w-24 h-24 text-3xl text-black bg-white rounded-full focus:outline-none"
-        >
-          <i class="fas fa-play"></i>
-        </button>
-        <div class="z-50 ml-8 text-left">
-          <!-- Song Info -->
-          <div class="text-3xl font-bold">{{ song.modified_name }}</div>
-          <div>{{ song.genre }}</div>
-        </div>
-      </div>
-    </section>
+	<main>
+		<!-- Music Header -->
+		<section class="relative w-full mb-8 text-center text-white py-14">
+			<div
+				class="box-border absolute inset-0 w-full h-full bg-contain music-bg"
+				style="background-image: url(/assets/img/song-header.png)"
+			></div>
+			<div class="container flex items-center mx-auto">
+				<!-- Play/Pause Button -->
+				<button
+					id="play-btn"
+					@click.prevent="newSong(song)"
+					type="button"
+					class="z-50 w-24 h-24 text-3xl text-black bg-white rounded-full focus:outline-none"
+				>
+					<i class="fas fa-play"></i>
+				</button>
+				<div class="z-50 ml-8 text-left">
+					<!-- Song Info -->
+					<div class="text-3xl font-bold">{{ song.modified_name }}</div>
+					<div>{{ song.genre }}</div>
+					<div class="song-price">{{ $n(1, 'currency', 'ru') }}</div>
+				</div>
+			</div>
+		</section>
 
-    <!-- Form -->
-    <section class="container mx-auto mt-6" id="comments">
-      <div class="relative flex flex-col bg-white border border-gray-200 rounded">
-        <div class="px-6 pt-6 pb-5 font-bold border-b border-gray-200">
-          <!-- Comment Count -->
-          <span class="card-title">Comments ({{ song.comment_count }})</span>
-          <i class="float-right text-2xl text-green-400 fa fa-comments"></i>
-        </div>
-        <div class="p-6">
-          <div
-            class="p-4 m-4 font-bold text-center text-white"
-            v-if="comment_show_alert"
-            :class="comment_alert_variant"
-          >
-            {{ comment_alert_message }}
-          </div>
+		<!-- Form -->
+		<section class="container mx-auto mt-6" id="comments">
+			<div
+				class="relative flex flex-col bg-white border border-gray-200 rounded"
+			>
+				<div class="px-6 pt-6 pb-5 font-bold border-b border-gray-200">
+					<!-- Comment Count -->
+					<span class="card-title">{{
+						$tc('song.comment_count', song.comment_count, {
+							count: song.comment_count,
+						})
+					}}</span>
+					<i class="float-right text-2xl text-green-400 fa fa-comments"></i>
+				</div>
+				<div class="p-6">
+					<div
+						class="p-4 m-4 font-bold text-center text-white"
+						v-if="comment_show_alert"
+						:class="comment_alert_variant"
+					>
+						{{ comment_alert_message }}
+					</div>
 
-          <vee-form :validation-schema="schema" @submit="addComment" v-if="userLoggedIn">
-            <vee-field
-              name="comment"
-              as="textarea"
-              class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded mb-4"
-              placeholder="Your comment here..."
-            ></vee-field>
-            <ErrorMessage class="text-red-600" name="comment" />
-            <button
-              type="submit"
-              :disabled="comment_in_submission"
-              class="py-1.5 px-3 rounded text-white bg-green-600 block"
-            >
-              Submit
-            </button>
-          </vee-form>
+					<vee-form
+						:validation-schema="schema"
+						@submit="addComment"
+						v-if="userLoggedIn"
+					>
+						<vee-field
+							name="comment"
+							as="textarea"
+							class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded mb-4"
+							placeholder="Your comment here..."
+						></vee-field>
+						<ErrorMessage class="text-red-600" name="comment" />
+						<button
+							type="submit"
+							:disabled="comment_in_submission"
+							class="py-1.5 px-3 rounded text-white bg-green-600 block"
+						>
+							Submit
+						</button>
+					</vee-form>
 
-          <!-- Sort Comments -->
-          <select
-            v-model="sort"
-            class="block mt-4 py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
-          >
-            <option value="1">Latest</option>
-            <option value="2">Oldest</option>
-          </select>
-        </div>
-      </div>
-    </section>
+					<!-- Sort Comments -->
+					<select
+						v-model="sort"
+						class="block mt-4 py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
+					>
+						<option value="1">Latest</option>
+						<option value="2">Oldest</option>
+					</select>
+				</div>
+			</div>
+		</section>
 
-    <!-- Comments -->
-    <ul class="container mx-auto">
-      <li
-        class="p-6 border border-gray-200 bg-gray-50"
-        v-for="comment in sortedComments"
-        :key="comment.docID"
-      >
-        <!-- Comment Author -->
-        <div class="mb-5">
-          <div class="font-bold">{{ comment.name }}</div>
-          <time>{{ comment.datePosted }}</time>
-        </div>
+		<!-- Comments -->
+		<ul class="container mx-auto">
+			<li
+				class="p-6 border border-gray-200 bg-gray-50"
+				v-for="comment in sortedComments"
+				:key="comment.docID"
+			>
+				<!-- Comment Author -->
+				<div class="mb-5">
+					<div class="font-bold">{{ comment.name }}</div>
+					<time>{{ comment.datePosted }}</time>
+				</div>
 
-        <p>
-          {{ comment.content }}
-        </p>
-      </li>
-    </ul>
-  </main>
+				<p>
+					{{ comment.content }}
+				</p>
+			</li>
+		</ul>
+	</main>
 </template>
 
 <script>
@@ -97,100 +109,105 @@ import useUserStore from '@/stores/user';
 import usePlayerStore from '@/stores/player';
 
 export default {
-  name: 'Song',
-  data() {
-    return {
-      song: {},
-      schema: {
-        comment: 'required|min:3',
-      },
-      comment_in_submission: false,
-      comment_show_alert: false,
-      comment_alert_variant: 'bg-blue-500',
-      comment_alert_message: 'Подождите, Ваш комментарий загружается!',
-      comments: [],
-      sort: '1',
-    };
-  },
-  computed: {
-    ...mapState(useUserStore, ['userLoggedIn']),
-    sortedComments() {
-      return this.comments.slice().sort((a, b) => {
-        if (this.sort === '1') {
-          return new Date(b.datePosted) - new Date(a.datePosted);
-        }
-        return new Date(a.datePosted) - new Date(b.datePosted);
-      });
-    },
-  },
-  async created() {
-    const docSnapshot = await songsCollection.doc(this.$route.params.id).get();
+	name: 'Song',
+	data() {
+		return {
+			song: {},
+			schema: {
+				comment: 'required|min:3',
+			},
+			comment_in_submission: false,
+			comment_show_alert: false,
+			comment_alert_variant: 'bg-blue-500',
+			comment_alert_message: 'Подождите, Ваш комментарий загружается!',
+			comments: [],
+			sort: '1',
+		};
+	},
+	computed: {
+		...mapState(useUserStore, ['userLoggedIn']),
+		sortedComments() {
+			return this.comments.slice().sort((a, b) => {
+				if (this.sort === '1') {
+					return new Date(b.datePosted) - new Date(a.datePosted);
+				}
+				return new Date(a.datePosted) - new Date(b.datePosted);
+			});
+		},
+	},
+	async beforeRouteEnter(to, from, next) {
+		const docSnapshot = await songsCollection.doc(to.params.id).get();
 
-    if (!docSnapshot.exists) {
-      this.$router.push({ name: 'home' });
-      return;
-    }
+		next((vm) => {
+			if (!docSnapshot.exists) {
+				vm.$router.push({ name: 'home' });
+				return;
+			}
 
-    const { sort } = this.$route.query;
-    this.sort = sort === '1' || sort === '2' ? sort : '1';
+			const { sort } = vm.$route.query;
 
-    this.song = docSnapshot.data();
-    this.getComments();
-  },
-  methods: {
-    ...mapActions(usePlayerStore, ['newSong']),
-    async addComment(values, { resetForm }) {
-      this.comment_in_submission = true;
-      this.comment_show_alert = true;
-      this.comment_alert_variant = 'bg-blue-500';
-      this.comment_alert_message = 'Подождите, Ваш комментарий загружается!';
+			vm.sort = sort === '1' || sort === '2' ? sort : '1';
 
-      const comment = {
-        content: values.comment,
-        datePosted: new Date().toString(),
-        sid: this.$route.params.id,
-        name: auth.currentUser.displayName,
-        uid: auth.currentUser.uid,
-      };
+			vm.song = docSnapshot.data();
+			vm.getComments();
+		});
+	},
+	methods: {
+		...mapActions(usePlayerStore, ['newSong']),
+		async addComment(values, { resetForm }) {
+			this.comment_in_submission = true;
+			this.comment_show_alert = true;
+			this.comment_alert_variant = 'bg-blue-500';
+			this.comment_alert_message = 'Подождите, Ваш комментарий загружается!';
 
-      await commentsCollection.add(comment);
-      this.song.comment_count += 1;
-      await songsCollection.doc(this.$route.params.id).update({
-        comment_count: this.song.comment_count,
-      });
+			const comment = {
+				content: values.comment,
+				datePosted: new Date().toString(),
+				sid: this.$route.params.id,
+				name: auth.currentUser.displayName,
+				uid: auth.currentUser.uid,
+			};
 
-      this.getComments();
+			await commentsCollection.add(comment);
+			this.song.comment_count += 1;
+			await songsCollection.doc(this.$route.params.id).update({
+				comment_count: this.song.comment_count,
+			});
 
-      this.comment_in_submission = false;
-      this.comment_alert_variant = 'bg-green-500';
-      this.comment_alert_message = ' Ваш комментарий добавлен!';
+			this.getComments();
 
-      resetForm();
-    },
-    async getComments() {
-      const snapshots = await commentsCollection.where('sid', '==', this.$route.params.id).get();
+			this.comment_in_submission = false;
+			this.comment_alert_variant = 'bg-green-500';
+			this.comment_alert_message = ' Ваш комментарий добавлен!';
 
-      this.comments = [];
+			resetForm();
+		},
+		async getComments() {
+			const snapshots = await commentsCollection
+				.where('sid', '==', this.$route.params.id)
+				.get();
 
-      snapshots.forEach((doc) => {
-        this.comments.push({
-          docID: doc.id,
-          ...doc.data(),
-        });
-      });
-    },
-  },
-  watch: {
-    sort(newVal) {
-      if (newVal === this.$route.query.sort) {
-        return;
-      }
-      this.$router.push({
-        query: {
-          sort: newVal,
-        },
-      });
-    },
-  },
+			this.comments = [];
+
+			snapshots.forEach((doc) => {
+				this.comments.push({
+					docID: doc.id,
+					...doc.data(),
+				});
+			});
+		},
+	},
+	watch: {
+		sort(newVal) {
+			if (newVal === this.$route.query.sort) {
+				return;
+			}
+			this.$router.push({
+				query: {
+					sort: newVal,
+				},
+			});
+		},
+	},
 };
 </script>

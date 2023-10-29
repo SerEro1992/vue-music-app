@@ -53,7 +53,7 @@
         <button
           type="submit"
           class="py-1.5 px-3 rounded text-white bg-green-600"
-          :disabled="is_submission"
+          :disabled="in_submission"
         >
           Submit
         </button>
@@ -75,20 +75,6 @@ import { ErrorMessage } from 'vee-validate';
 import { songsCollection, storage } from '@/includes/firebase';
 export default {
   name: 'CompositionItem',
-  data() {
-    return {
-      showForm: false,
-      schema: {
-        modified_name: 'required',
-        genre: 'alpha_spaces',
-      },
-      is_submission: false,
-      show_alert: false,
-      alert_variant: 'bg-blue-500',
-      alert_message: 'Пожалуйста, подождите! Обновляем информацию о песне',
-    };
-  },
-
   props: {
     song: {
       type: Object,
@@ -110,6 +96,21 @@ export default {
       type: Function,
     },
   },
+  data() {
+    return {
+      showForm: false,
+      schema: {
+        modified_name: 'required',
+        genre: 'alpha_spaces',
+      },
+      in_submission: false,
+      show_alert: false,
+      alert_variant: 'bg-blue-500',
+      alert_message: 'Пожалуйста, подождите! Обновляем информацию о песне',
+    };
+  },
+
+
   components: { ErrorMessage },
   methods: {
     async edit(values) {

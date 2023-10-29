@@ -50,7 +50,7 @@ export default {
     return {
       loginSchema: {
         email: 'required|email',
-        password: 'required|min:4|max:100',
+        password: 'required|min:6|max:100',
       },
       login_in_submission: false,
       login_show_alert: false,

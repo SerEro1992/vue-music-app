@@ -9,13 +9,14 @@
 
   <app-player />
 
-  <AppAuth />
+  <app-auth />
 </template>
 
 <script>
 import AppHeader from '@/components/AppHeader.vue';
 import AppAuth from '@/components/AppAuth.vue';
 import AppPlayer from '@/components/AppPlayer.vue';
+
 import { mapWritableState } from 'pinia';
 import useUserStore from '@/stores/user.js';
 import { auth } from './includes/firebase';

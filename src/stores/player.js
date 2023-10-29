@@ -56,6 +56,7 @@ export default defineStore('player', {
       }
 
       const { x, width } = event.currentTarget.getBoundingClientRect();
+	  // Document = 2000, Timeline = 1000, clientX = 1000, Distance = 500
       const clickX = event.clientX - x;
       const percentage = clickX / width;
       const seconds = this.sound.duration() * percentage;

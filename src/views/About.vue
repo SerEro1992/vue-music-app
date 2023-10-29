@@ -1,3 +1,6 @@
 <template>
-  <h1>This is page about</h1>
+	<div class="about">
+		<h1>This is an about page</h1>
+		<base-button />
+	</div>
 </template>
